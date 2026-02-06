@@ -1,0 +1,57 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(32, 33, 36, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 600px;
+    max-width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+    padding: 4px 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-title-input {
+    border: none;
+    font-size: 22px;
+    /* Larger font for title in modal */
+    font-weight: 500;
+    padding: 16px 0 12px 0;
+    outline: none;
+    width: 100%;
+}
+
+.modal-content-input {
+    border: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    padding: 12px 0 24px 0;
+    outline: none;
+    width: 100%;
+    resize: none;
+    min-height: 150px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.modal-actions {
+    display: flex;
+}

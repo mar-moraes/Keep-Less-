@@ -1,0 +1,79 @@
+.note-card {
+    background-color: #fff;
+    border: 1px solid var(--note-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: box-shadow 0.2s;
+    break-inside: avoid;
+    box-sizing: border-box;
+}
+
+.note-card:hover {
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.note-card:hover .note-footer-actions {
+    opacity: 1;
+}
+
+.note-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+}
+
+.note-content {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.note-footer-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    position: absolute;
+    bottom: 8px;
+    left: 4px;
+    right: 4px;
+}
+
+/* Color Palette */
+.color-palette-wrapper {
+    position: relative;
+}
+
+.color-palette {
+    position: absolute;
+    bottom: 30px;
+    left: -50px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 130px;
+    z-index: 100;
+}
+
+.color-option {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.color-option:hover {
+    border-color: #999;
+}
