@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
 
 :root {
+  /* Light Mode (Default) */
   --bg-color: #ffffff;
   --text-color: #202124;
   --secondary-text: #5f6368;
@@ -10,10 +11,39 @@
   --border-color: #dadce0;
   --hover-color: #f1f3f4;
   --active-color: #feefc3;
-  --primary-color: #fbbc04; /* Keep yellow */
+  --primary-color: #fbbc04;
   --note-bg: #ffffff;
   --note-border: #e0e0e0;
   --shadow-color: rgba(60, 64, 67, 0.3);
+  --header-bg: #ffffff;
+  --search-bg: #f1f3f4;
+  --icon-color: #5f6368;
+  --icon-hover-bg: rgba(60, 64, 67, 0.08);
+  --modal-overlay: rgba(229, 229, 229, 0.75);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode */
+    --bg-color: #202124;
+    --text-color: #e8eaed;
+    --secondary-text: #9aa0a6;
+    --border-color: #5f6368;
+    --hover-color: rgba(232, 234, 237, 0.08);
+    --active-color: #41331c;
+    /* Darker yellow/brown for active state */
+    --primary-color: #fbbc04;
+    /* Keep yellow, maybe tweak if too bright */
+    --note-bg: #202124;
+    --note-border: #5f6368;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --header-bg: #202124;
+    --search-bg: #525355;
+    --icon-color: #9aa0a6;
+    --icon-hover-bg: rgba(232, 234, 237, 0.08);
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+    /* Darker overlay for dark mode */
+  }
 }
 
 body {
@@ -48,7 +78,8 @@ body {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
+  font-size: 24px;
+  /* Preferred icon size */
   display: inline-block;
   line-height: 1;
   text-transform: none;

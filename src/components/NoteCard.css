@@ -1,5 +1,5 @@
 .note-card {
-    background-color: #fff;
+    background-color: var(--note-bg);
     border: 1px solid var(--note-border);
     border-radius: 8px;
     padding: 12px 16px;
@@ -11,7 +11,7 @@
 }
 
 .note-card:hover {
-    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    box-shadow: 0 1px 2px 0 var(--shadow-color), 0 1px 3px 1px var(--shadow-color);
 }
 
 .note-card:hover .note-footer-actions {
@@ -35,14 +35,11 @@
 
 .note-footer-actions {
     display: flex;
-    justify-content: space-around;
-    margin-top: 8px;
+    justify-content: space-between;
+    margin-top: 12px;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
-    position: absolute;
-    bottom: 8px;
-    left: 4px;
-    right: 4px;
+    padding: 0 4px;
 }
 
 /* Color Palette */
@@ -54,8 +51,8 @@
     position: absolute;
     bottom: 30px;
     left: -50px;
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: var(--note-bg);
+    border: 1px solid var(--border-color);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     padding: 5px;
@@ -69,11 +66,95 @@
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-color);
     margin: 2px;
     cursor: pointer;
 }
 
 .color-option:hover {
     border-color: #999;
+}
+
+/* Note Images */
+.note-images {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.note-image-attachment {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+/* Category Chip */
+.note-category-chip {
+    display: inline-block;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 11px;
+    color: var(--secondary-text);
+    margin-top: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Updated Palette Styles */
+.color-palette {
+    flex-direction: column;
+    width: 160px;
+    /* Wider for tabs */
+    padding: 8px;
+}
+
+.palette-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+}
+
+.palette-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--secondary-text);
+    border-bottom: 2px solid transparent;
+}
+
+.palette-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 500;
+}
+
+.palette-options {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image-option {
+    background-size: cover;
+    background-position: center;
+}
+
+.no-image-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f3f4;
+}
+
+.no-image-option .material-icons {
+    font-size: 16px;
+    color: #5f6368;
+}
+
+/* Ensure note content wrapper takes available space but allows footer to flow */
+.note-card-content-wrapper {
+    margin-bottom: 4px;
 }

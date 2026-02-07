@@ -34,9 +34,7 @@ const Header = ({ toggleSidebar }) => {
         <button className="icon-button">
           <span className="material-icons">settings</span>
         </button>
-        <div className="profile-icon">
-          <span>U</span>
-        </div>
+
       </div>
     </header>
   );

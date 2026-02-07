@@ -11,8 +11,8 @@ function App() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [view, setView] = useState('NOTES'); // NOTES, ARCHIVE, TRASH
   const [notes, setNotes] = useState([
-    { id: 1, title: 'Welcome to Keep Less', content: 'This is a clone of Google Keep created with React.', isArchived: false, isTrashed: false, color: '#ffffff' },
-    { id: 2, title: 'Features', content: '- Create notes\n- Responsive design\n- Sidebar navigation\n- Masonry grid layout', isArchived: false, isTrashed: false, color: '#ffffff' },
+    { id: 1, title: 'Welcome to Keep Less', content: 'This is a clone of Google Keep created with React.', isArchived: false, isTrashed: false, color: '#ffffff', images: [], backgroundImage: null, category: 'Personal' },
+    { id: 2, title: 'Features', content: '- Create notes\n- Responsive design\n- Sidebar navigation\n- Masonry grid layout', isArchived: false, isTrashed: false, color: '#ffffff', images: [], backgroundImage: null, category: 'Work' },
   ]);
 
   const toggleSidebar = () => {
@@ -25,6 +25,9 @@ function App() {
       isArchived: false,
       isTrashed: false,
       color: '#ffffff',
+      images: [],
+      backgroundImage: null,
+      category: '',
       ...noteParams
     };
     setNotes([newNote, ...notes]);
@@ -63,7 +66,19 @@ function App() {
   };
 
   const changeNoteColor = (id, color) => {
-    setNotes(notes.map(n => n.id === id ? { ...n, color } : n));
+    setNotes(notes.map(n => n.id === id ? { ...n, color, backgroundImage: null } : n)); // Clear bg image if color is selected
+  };
+
+  const addImageToNote = (id, imageUrl) => {
+    setNotes(notes.map(n => n.id === id ? { ...n, images: [...(n.images || []), imageUrl] } : n));
+  };
+
+  const changeNoteBackground = (id, backgroundImage) => {
+    setNotes(notes.map(n => n.id === id ? { ...n, backgroundImage, color: '#ffffff' } : n)); // Reset color if bg image is selected
+  };
+
+  const changeNoteCategory = (id, category) => {
+    setNotes(notes.map(n => n.id === id ? { ...n, category } : n));
   };
 
   // Filter notes based on current view
@@ -92,6 +107,7 @@ function App() {
           {view === 'NOTES' && <NoteInput onAddParams={addNote} />}
           <NotesGrid
             notes={getFilteredNotes()}
+            view={view}
             onNoteClick={handleNoteClick}
             onArchive={archiveNote}
             onUnarchive={unarchiveNote}
@@ -99,6 +115,9 @@ function App() {
             onRestore={restoreNote}
             onPermanentlyDelete={permanentlyDeleteNote}
             onColorChange={changeNoteColor}
+            onImageAdd={addImageToNote}
+            onBackgroundChange={changeNoteBackground}
+            onCategoryChange={changeNoteCategory}
           />
         </main>
       </div>
@@ -107,6 +126,15 @@ function App() {
           note={selectedNote}
           onClose={handleCloseModal}
           onUpdate={handleUpdateNote}
+          onArchive={archiveNote}
+          onUnarchive={unarchiveNote}
+          onDelete={deleteNote}
+          onRestore={restoreNote}
+          onPermanentlyDelete={permanentlyDeleteNote}
+          onColorChange={changeNoteColor}
+          onImageAdd={addImageToNote}
+          onBackgroundChange={changeNoteBackground}
+          onCategoryChange={changeNoteCategory}
         />
       )}
     </div>

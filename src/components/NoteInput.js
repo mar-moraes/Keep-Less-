@@ -5,6 +5,7 @@ const NoteInput = ({ onAddParams }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [category, setCategory] = useState('');
     const containerRef = useRef(null);
 
     // Close input when clicking outside
@@ -23,14 +24,15 @@ const NoteInput = ({ onAddParams }) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [title, content]); // Dep needed to capture current state
+    }, [title, content, category]); // Dep needed to capture current state
 
     const closeInput = () => {
         if (title.trim() || content.trim()) {
-            onAddParams({ title, content });
+            onAddParams({ title, content, category });
         }
         setTitle('');
         setContent('');
+        setCategory('');
         setIsExpanded(false);
     };
 

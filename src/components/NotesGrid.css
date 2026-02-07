@@ -23,3 +23,25 @@
         column-count: 1;
     }
 }
+
+/* Category Headers for Archive View */
+.notes-category-section {
+    margin-bottom: 32px;
+}
+
+.category-header {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--secondary-text);
+    margin-bottom: 16px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.Empty-state {
+    text-align: center;
+    color: var(--secondary-text);
+    margin-top: 48px;
+    font-size: 16px;
+}

@@ -4,7 +4,7 @@
     top: var(--header-height);
     bottom: 0;
     width: var(--sidebar-width);
-    background-color: #fff;
+    background-color: var(--header-bg);
     padding-top: 8px;
     transition: width 0.2s ease;
     overflow: hidden;
@@ -50,7 +50,7 @@
 
 .nav-item .material-icons {
     margin-right: 20px;
-    color: var(--secondary-text);
+    color: var(--icon-color);
 }
 
 .sidebar.collapsed .nav-item .material-icons {

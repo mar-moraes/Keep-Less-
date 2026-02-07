@@ -9,9 +9,14 @@ const NoteCard = ({
     onDelete,
     onRestore,
     onPermanentlyDelete,
-    onColorChange
+    onColorChange,
+    onImageAdd,
+    onBackgroundChange,
+    onCategoryChange
 }) => {
     const [showColorPalette, setShowColorPalette] = useState(false);
+    const [paletteTab, setPaletteTab] = useState('COLORS'); // COLORS or IMAGES
+    const fileInputRef = React.useRef(null);
 
     const colors = [
         '#ffffff', // Default
@@ -28,6 +33,16 @@ const NoteCard = ({
         '#e8eaed'  // Gray
     ];
 
+    // Placeholder for background images - to be populated later
+    const backgroundImages = [
+        // 'url("https://www.gstatic.com/keep/backgrounds/grocery_light_thumb_0615.svg")',
+        // 'url("https://www.gstatic.com/keep/backgrounds/food_light_thumb_0615.svg")',
+        // 'url("https://www.gstatic.com/keep/backgrounds/music_light_thumb_0615.svg")',
+        // 'url("https://www.gstatic.com/keep/backgrounds/recipe_light_thumb_0615.svg")',
+        // 'url("https://www.gstatic.com/keep/backgrounds/video_light_thumb_0615.svg")',
+        // 'url("https://www.gstatic.com/keep/backgrounds/places_light_thumb_0615.svg")',
+    ];
+
     const handleAction = (e, action) => {
         e.stopPropagation();
         action();
@@ -38,14 +53,88 @@ const NoteCard = ({
         setShowColorPalette(!showColorPalette);
     };
 
+    const handleImageClick = (e) => {
+        e.stopPropagation();
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validation
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        if (!validTypes.includes(file.type)) {
+            alert('Invalid file type. Please select a JPEG, PNG, or GIF.');
+            return;
+        }
+
+        if (file.size > 25 * 1024 * 1024) { // 25MB
+            alert('File size exceeds 25MB limit.');
+            return;
+        }
+
+        // 10MP Check (Approximate via file size not perfect, but we can check dimensions after load)
+        // For strict 10MP check, we'd need to load into an Image object.
+        // For this task, we'll proceed assuming the file is acceptable or checking dimensions async.
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const megaPixels = (img.width * img.height) / 1000000;
+                if (megaPixels > 10) {
+                    alert('Image resolution exceeds 10 Megapixels.');
+                    return;
+                }
+                // Valid
+                onImageAdd(note.id, event.target.result);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
     return (
         <div
             className="note-card"
             onClick={() => onClick(note)}
-            style={{ backgroundColor: note.color || '#ffffff' }}
+            style={{
+                backgroundColor: (note.color && note.color !== '#ffffff') ? note.color : undefined,
+                backgroundImage: note.backgroundImage || 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+            }}
         >
-            {note.title && <div className="note-title">{note.title}</div>}
-            <div className="note-content">{note.content}</div>
+            {/* Hidden File Input */}
+            <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/jpeg, image/png, image/gif"
+                onChange={handleFileChange}
+                onClick={(e) => e.stopPropagation()} // Stop click on input from bubbling to card
+            />
+
+            {/* Attached Images */}
+            {note.images && note.images.length > 0 && (
+                <div className="note-images">
+                    {note.images.map((img, index) => (
+                        <img key={index} src={img} alt="attachment" className="note-image-attachment" />
+                    ))}
+                </div>
+            )}
+
+            <div className="note-card-content-wrapper">
+                {note.title && <div className="note-title">{note.title}</div>}
+                <div className="note-content">{note.content}</div>
+                {note.category && (
+                    <div className="note-category-chip">
+                        {note.category}
+                    </div>
+                )}
+            </div>
+
             <div className="note-footer-actions">
                 {note.isTrashed ? (
                     <>
@@ -79,22 +168,64 @@ const NoteCard = ({
                             </button>
                             {showColorPalette && (
                                 <div className="color-palette" onClick={(e) => e.stopPropagation()}>
-                                    {colors.map(color => (
-                                        <div
-                                            key={color}
-                                            className="color-option"
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => {
-                                                onColorChange(note.id, color);
-                                                setShowColorPalette(false);
-                                            }}
-                                        />
-                                    ))}
+                                    <div className="palette-tabs">
+                                        <button
+                                            className={`palette-tab ${paletteTab === 'COLORS' ? 'active' : ''}`}
+                                            onClick={() => setPaletteTab('COLORS')}
+                                        >Color</button>
+                                        <button
+                                            className={`palette-tab ${paletteTab === 'IMAGES' ? 'active' : ''}`}
+                                            onClick={() => setPaletteTab('IMAGES')}
+                                        >Image</button>
+                                    </div>
+
+                                    <div className="palette-options">
+                                        {paletteTab === 'COLORS' && colors.map(color => (
+                                            <div
+                                                key={color}
+                                                className="color-option"
+                                                style={{ backgroundColor: color }}
+                                                onClick={() => {
+                                                    onColorChange(note.id, color);
+                                                    setShowColorPalette(false);
+                                                }}
+                                            />
+                                        ))}
+                                        {paletteTab === 'IMAGES' && (
+                                            <>
+                                                <div
+                                                    className="color-option no-image-option"
+                                                    title="No Background"
+                                                    onClick={() => {
+                                                        onBackgroundChange(note.id, null);
+                                                        setShowColorPalette(false); // Can keep open if preferred
+                                                    }}
+                                                >
+                                                    <span className="material-icons">block</span>
+                                                </div>
+                                                {backgroundImages.map((bg, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="color-option image-option"
+                                                        style={{ backgroundImage: bg }}
+                                                        onClick={() => {
+                                                            onBackgroundChange(note.id, bg);
+                                                            setShowColorPalette(false);
+                                                        }}
+                                                    />
+                                                ))}
+                                                {/* Placeholder message if empty */}
+                                                {backgroundImages.length === 0 && <div style={{ padding: '5px', fontSize: '12px', color: '#666' }}>No images yet</div>}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        <button className="icon-button-small" title="Add image" onClick={(e) => e.stopPropagation()}><span className="material-icons">image</span></button>
+                        <button className="icon-button-small" title="Add image" onClick={handleImageClick}>
+                            <span className="material-icons">image</span>
+                        </button>
 
                         {note.isArchived ? (
                             <button

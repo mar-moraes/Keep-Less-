@@ -5,7 +5,7 @@
     padding: 8px;
     height: var(--header-height);
     border-bottom: 1px solid var(--border-color);
-    background-color: #fff;
+    background-color: var(--header-bg);
     position: fixed;
     top: 0;
     width: 100%;
@@ -39,7 +39,7 @@
 .search-bar {
     display: flex;
     align-items: center;
-    background: #f1f3f4;
+    background: var(--search-bg);
     border-radius: 8px;
     padding: 0px 8px;
     height: 46px;
@@ -48,7 +48,7 @@
 }
 
 .search-bar:focus-within {
-    background: #fff;
+    background: var(--header-bg);
     box-shadow: 0 1px 1px 0 rgba(65, 69, 73, 0.3), 0 1px 3px 1px rgba(65, 69, 73, 0.15);
 }
 
@@ -74,7 +74,7 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    color: var(--secondary-text);
+    color: var(--icon-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -82,7 +82,7 @@
 }
 
 .icon-button:hover {
-    background-color: rgba(60, 64, 67, 0.08);
+    background-color: var(--icon-hover-bg);
 }
 
 .icon-button .material-icons {
