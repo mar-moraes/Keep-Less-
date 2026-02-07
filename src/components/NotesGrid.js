@@ -16,26 +16,61 @@ const NotesGrid = ({
     onBackgroundChange,
     onCategoryChange
 }) => {
-    // If not Archive view, render as single grid
+    // If not Archive view, render as single grid (or split if Label view has archived)
     if (view !== 'ARCHIVE') {
+        const activeNotes = notes.filter(n => !n.isArchived);
+        const archivedNotes = notes.filter(n => n.isArchived);
+
         return (
-            <div className="notes-grid">
-                {notes.map((note) => (
-                    <NoteCard
-                        key={note.id}
-                        note={note}
-                        onClick={onNoteClick}
-                        onArchive={onArchive}
-                        onUnarchive={onUnarchive}
-                        onDelete={onDelete}
-                        onRestore={onRestore}
-                        onPermanentlyDelete={onPermanentlyDelete}
-                        onColorChange={onColorChange}
-                        onImageAdd={onImageAdd}
-                        onBackgroundChange={onBackgroundChange}
-                        onCategoryChange={onCategoryChange}
-                    />
-                ))}
+            <div className="notes-grid-wrapper">
+                {/* Active Notes */}
+                {activeNotes.length > 0 && (
+                    <div className="notes-grid">
+                        {activeNotes.map((note) => (
+                            <NoteCard
+                                key={note.id}
+                                note={note}
+                                onClick={onNoteClick}
+                                onArchive={onArchive}
+                                onUnarchive={onUnarchive}
+                                onDelete={onDelete}
+                                onRestore={onRestore}
+                                onPermanentlyDelete={onPermanentlyDelete}
+                                onColorChange={onColorChange}
+                                onImageAdd={onImageAdd}
+                                onBackgroundChange={onBackgroundChange}
+                                onCategoryChange={onCategoryChange}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Archived Notes in Label View */}
+                {archivedNotes.length > 0 && (
+                    <div className="archived-section">
+                        <div className="section-header" style={{ color: '#9AA0A6', marginBottom: '10px', marginLeft: '10px', fontSize: '12px' }}>ARCHIVE</div>
+                        <div className="notes-grid">
+                            {archivedNotes.map((note) => (
+                                <NoteCard
+                                    key={note.id}
+                                    note={note}
+                                    onClick={onNoteClick}
+                                    onArchive={onArchive}
+                                    onUnarchive={onUnarchive}
+                                    onDelete={onDelete}
+                                    onRestore={onRestore}
+                                    onPermanentlyDelete={onPermanentlyDelete}
+                                    onColorChange={onColorChange}
+                                    onImageAdd={onImageAdd}
+                                    onBackgroundChange={onBackgroundChange}
+                                    onCategoryChange={onCategoryChange}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+
             </div>
         );
     }
@@ -76,7 +111,7 @@ const NotesGrid = ({
                     </div>
                 </div>
             ))}
-            {notes.length === 0 && <div className="Empty-state">No archived notes</div>}
+
         </div>
     );
 };
