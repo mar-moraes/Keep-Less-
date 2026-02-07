@@ -17,6 +17,7 @@ const NoteCard = ({
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [paletteTab, setPaletteTab] = useState('COLORS'); // COLORS or IMAGES
     const fileInputRef = React.useRef(null);
+    const paletteRef = React.useRef(null);
 
     const colors = [
         '#ffffff', // Default
@@ -42,6 +43,22 @@ const NoteCard = ({
         // 'url("https://www.gstatic.com/keep/backgrounds/video_light_thumb_0615.svg")',
         // 'url("https://www.gstatic.com/keep/backgrounds/places_light_thumb_0615.svg")',
     ];
+
+    // Close palette when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (paletteRef.current && !paletteRef.current.contains(event.target)) {
+                setShowColorPalette(false);
+            }
+        };
+
+        if (showColorPalette) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showColorPalette]);
 
     const handleAction = (e, action) => {
         e.stopPropagation();
@@ -167,7 +184,7 @@ const NoteCard = ({
                                 <span className="material-icons">palette</span>
                             </button>
                             {showColorPalette && (
-                                <div className="color-palette" onClick={(e) => e.stopPropagation()}>
+                                <div className="color-palette" ref={paletteRef} onClick={(e) => e.stopPropagation()}>
                                     <div className="palette-tabs">
                                         <button
                                             className={`palette-tab ${paletteTab === 'COLORS' ? 'active' : ''}`}
@@ -187,7 +204,7 @@ const NoteCard = ({
                                                 style={{ backgroundColor: color }}
                                                 onClick={() => {
                                                     onColorChange(note.id, color);
-                                                    setShowColorPalette(false);
+                                                    // setShowColorPalette(false); // Kept open as requested
                                                 }}
                                             />
                                         ))}
@@ -198,7 +215,7 @@ const NoteCard = ({
                                                     title="No Background"
                                                     onClick={() => {
                                                         onBackgroundChange(note.id, null);
-                                                        setShowColorPalette(false); // Can keep open if preferred
+                                                        // setShowColorPalette(false);
                                                     }}
                                                 >
                                                     <span className="material-icons">block</span>
@@ -210,7 +227,7 @@ const NoteCard = ({
                                                         style={{ backgroundImage: bg }}
                                                         onClick={() => {
                                                             onBackgroundChange(note.id, bg);
-                                                            setShowColorPalette(false);
+                                                            // setShowColorPalette(false);
                                                         }}
                                                     />
                                                 ))}

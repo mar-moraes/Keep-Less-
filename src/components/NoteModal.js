@@ -19,10 +19,21 @@ const NoteModal = ({
     const [paletteTab, setPaletteTab] = useState('COLORS');
     const modalRef = useRef(null);
     const fileInputRef = useRef(null);
+    const paletteRef = useRef(null);
 
     const colors = [
-        '#ffffff', '#f28b82', '#fbbc04', '#fff475', '#ccff90', '#a7ffeb',
-        '#cbf0f8', '#aecbfa', '#d7aefb', '#fdcfe8', '#e6c9a8', '#e8eaed'
+        '#ffffff', // Default
+        '#f28b82', // Red
+        '#fbbc04', // Orange
+        '#fff475', // Yellow
+        '#ccff90', // Green
+        '#a7ffeb', // Teal
+        '#cbf0f8', // Blue
+        '#aecbfa', // Dark Blue
+        '#d7aefb', // Purple
+        '#fdcfe8', // Pink
+        '#e6c9a8', // Brown
+        '#e8eaed'  // Gray
     ];
 
     const backgroundImages = []; // Same placeholder as NoteCard
@@ -43,12 +54,34 @@ const NoteModal = ({
         reader.readAsDataURL(file);
     };
 
-    // Update local state if note prop changes
+    // Update local state if note prop changes - Only when ID changes to avoid overwriting typed text on color change
     useEffect(() => {
         setTitle(note.title);
         setContent(note.content);
         setCategory(note.category || '');
-    }, [note]);
+    }, [note.id]);
+
+    // Close palette when clicking outside
+    useEffect(() => {
+        const handleClickOutsidePalette = (event) => {
+            if (paletteRef.current && !paletteRef.current.contains(event.target)) {
+                // Only close if we are not clicking the toggle button (which stops prop, but let's be safe)
+                // Actually, the toggle button stops propagation, so this document listener will fire if we click elsewhere in modal
+                // We need to be careful not to conflict with Modal's own outside click closing.
+                // Modal's outside click closes the MODAL.
+                // If we click inside modal but outside palette, palette should close.
+                setShowColorPalette(false);
+            }
+        };
+
+        if (showColorPalette) {
+            document.addEventListener('mousedown', handleClickOutsidePalette);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutsidePalette);
+        };
+    }, [showColorPalette]);
+
 
     // Close when clicking outside
     useEffect(() => {
@@ -62,7 +95,7 @@ const NoteModal = ({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [title, content, category]);
+    }, [title, content, category, note]);
 
     const handleClose = () => {
         onUpdate({ ...note, title, content, category });
@@ -105,11 +138,11 @@ const NoteModal = ({
                         <button className="icon-button-small" title="Collaborator"><span className="material-icons">person_add</span></button>
 
                         <div className="color-palette-wrapper">
-                            <button className="icon-button-small" title="Change color" onClick={() => setShowColorPalette(!showColorPalette)}>
+                            <button className="icon-button-small" title="Change color" onClick={(e) => { e.stopPropagation(); setShowColorPalette(!showColorPalette); }}>
                                 <span className="material-icons">palette</span>
                             </button>
                             {showColorPalette && (
-                                <div className="color-palette">
+                                <div className="color-palette" ref={paletteRef} onClick={(e) => e.stopPropagation()}>
                                     <div className="palette-tabs">
                                         <button
                                             className={`palette-tab ${paletteTab === 'COLORS' ? 'active' : ''}`}
@@ -128,7 +161,7 @@ const NoteModal = ({
                                                 style={{ backgroundColor: color }}
                                                 onClick={() => {
                                                     onColorChange(note.id, color);
-                                                    setShowColorPalette(false);
+                                                    // setShowColorPalette(false); // Remove to persist
                                                 }}
                                             />
                                         ))}
@@ -139,7 +172,7 @@ const NoteModal = ({
                                                     title="No Background"
                                                     onClick={() => {
                                                         onBackgroundChange(note.id, null);
-                                                        setShowColorPalette(false);
+                                                        // setShowColorPalette(false);
                                                     }}
                                                 >
                                                     <span className="material-icons">block</span>
@@ -151,7 +184,7 @@ const NoteModal = ({
                                                         style={{ backgroundImage: bg }}
                                                         onClick={() => {
                                                             onBackgroundChange(note.id, bg);
-                                                            setShowColorPalette(false);
+                                                            // setShowColorPalette(false);
                                                         }}
                                                     />
                                                 ))}

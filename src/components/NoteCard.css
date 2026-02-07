@@ -158,3 +158,8 @@
 .note-card-content-wrapper {
     margin-bottom: 4px;
 }
+
+/* Smooth Background Transition */
+.note-card {
+    transition: background-color 0.4s ease-in-out, box-shadow 0.2s;
+}

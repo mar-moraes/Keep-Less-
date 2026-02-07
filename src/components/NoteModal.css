@@ -58,6 +58,10 @@
 
 .modal-actions {
     display: flex;
+    flex: 1;
+    justify-content: space-between;
+    margin-right: 16px;
+    /* Gap before Close button */
 }
 
 .modal-category-input {
@@ -81,4 +85,9 @@
     margin: 8px 16px;
     background-color: rgba(0, 0, 0, 0.05);
     width: fit-content;
+}
+
+/* Smooth Background Transition */
+.modal-content {
+    transition: background-color 0.4s ease-in-out;
 }

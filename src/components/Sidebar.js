@@ -1,14 +1,25 @@
 import React from 'react';
 import './Sidebar.css';
 
-const Sidebar = ({ isExpanded, activeView, onViewChange }) => {
-    const navItems = [
+const Sidebar = ({ isExpanded, activeView, onViewChange, labels = [] }) => {
+    const mainItems = [
         { icon: 'lightbulb', label: 'Notes', id: 'NOTES' },
         { icon: 'notifications', label: 'Reminders', id: 'REMINDERS' },
-        { icon: 'label', label: 'Edit labels', id: 'LABELS' },
+    ];
+
+    const labelItems = labels.map(label => ({
+        icon: 'label', // Material icon name for label tag
+        label: label,
+        id: label
+    }));
+
+    const footerItems = [
+        { icon: 'edit', label: 'Edit labels', id: 'LABELS' },
         { icon: 'archive', label: 'Archive', id: 'ARCHIVE' },
         { icon: 'delete', label: 'Trash', id: 'TRASH' },
     ];
+
+    const navItems = [...mainItems, ...labelItems, ...footerItems];
 
     return (
         <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
