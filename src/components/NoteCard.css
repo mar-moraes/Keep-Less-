@@ -79,14 +79,32 @@
 .note-images {
     width: 100%;
     margin-bottom: 8px;
+    display: flex;
+    gap: 4px;
+    overflow: hidden;
+    /* Hide overflow on card, usually just show first few or crop */
+    border-radius: 4px;
+    /* Round container corners */
 }
 
 .note-image-attachment {
+    width: auto;
+    height: 200px;
+    /* Fixed height for consistency */
+    flex: 1 1 auto;
+    /* Grow/shrink to fit */
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0;
+    max-width: 100%;
+    /* Prevent toggle overlap */
+}
+
+/* If only one image, let it be full width */
+.note-images:has(> .note-image-attachment:only-child) .note-image-attachment {
     width: 100%;
     height: auto;
-    display: block;
-    border-radius: 4px;
-    margin-bottom: 4px;
+    max-height: 300px;
 }
 
 /* Category Chip */

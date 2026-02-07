@@ -17,6 +17,7 @@ const NoteModal = ({
     const [category, setCategory] = useState(note.category || '');
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [paletteTab, setPaletteTab] = useState('COLORS');
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const modalRef = useRef(null);
     const fileInputRef = useRef(null);
     const paletteRef = useRef(null);
@@ -59,17 +60,13 @@ const NoteModal = ({
         setTitle(note.title);
         setContent(note.content);
         setCategory(note.category || '');
+        setCurrentImageIndex(0);
     }, [note.id]);
 
     // Close palette when clicking outside
     useEffect(() => {
         const handleClickOutsidePalette = (event) => {
             if (paletteRef.current && !paletteRef.current.contains(event.target)) {
-                // Only close if we are not clicking the toggle button (which stops prop, but let's be safe)
-                // Actually, the toggle button stops propagation, so this document listener will fire if we click elsewhere in modal
-                // We need to be careful not to conflict with Modal's own outside click closing.
-                // Modal's outside click closes the MODAL.
-                // If we click inside modal but outside palette, palette should close.
                 setShowColorPalette(false);
             }
         };
@@ -102,6 +99,20 @@ const NoteModal = ({
         onClose();
     };
 
+    const handleNextImage = (e) => {
+        e.stopPropagation();
+        if (note.images && note.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev + 1) % note.images.length);
+        }
+    };
+
+    const handlePrevImage = (e) => {
+        e.stopPropagation();
+        if (note.images && note.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev - 1 + note.images.length) % note.images.length);
+        }
+    };
+
     return (
         <div className="modal-overlay">
             <div
@@ -114,6 +125,41 @@ const NoteModal = ({
                     backgroundPosition: 'center'
                 }}
             >
+                {/* Attached Images - Single View Carousel */}
+                {note.images && note.images.length > 0 && (
+                    <div className="modal-images-container" style={{ position: 'relative' }}>
+                        <div className="modal-image-wrapper">
+                            <img
+                                src={note.images[currentImageIndex]}
+                                alt={`attachment ${currentImageIndex + 1}`}
+                                className="modal-image-attachment"
+                            />
+                        </div>
+
+                        {note.images.length > 1 && (
+                            <>
+                                <button className="image-nav-button prev-button" onClick={handlePrevImage}>
+                                    <span className="material-icons">chevron_left</span>
+                                </button>
+                                <button className="image-nav-button next-button" onClick={handleNextImage}>
+                                    <span className="material-icons">chevron_right</span>
+                                </button>
+                                <div className="image-counter" style={{
+                                    position: 'absolute',
+                                    bottom: '10px',
+                                    right: '10px',
+                                    background: 'rgba(0,0,0,0.5)',
+                                    color: 'white',
+                                    padding: '2px 6px',
+                                    borderRadius: '10px',
+                                    fontSize: '10px'
+                                }}>
+                                    {currentImageIndex + 1} / {note.images.length}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
                 <input
                     type="text"
                     className="modal-title-input"
