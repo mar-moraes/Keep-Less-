@@ -8,6 +8,8 @@ const NoteModal = ({
     onArchive,
     onUnarchive,
     onDelete,
+    onRestore,
+    onPermanentlyDelete,
     onColorChange,
     onImageAdd,
     onBackgroundChange
@@ -253,19 +255,40 @@ const NoteModal = ({
                             onChange={handleFileChange}
                         />
 
-                        {note.isArchived ? (
-                            <button className="icon-button-small" title="Unarchive" onClick={() => { onUnarchive(note.id); onClose(); }}>
-                                <span className="material-icons">unarchive</span>
-                            </button>
+                        {note.isTrashed ? (
+                            <>
+                                <button
+                                    className="icon-button-small"
+                                    title="Restore"
+                                    onClick={() => { onRestore(note.id); onClose(); }}
+                                >
+                                    <span className="material-icons">restore_from_trash</span>
+                                </button>
+                                <button
+                                    className="icon-button-small"
+                                    title="Delete Forever"
+                                    onClick={() => { onPermanentlyDelete(note.id); onClose(); }}
+                                >
+                                    <span className="material-icons">delete_forever</span>
+                                </button>
+                            </>
                         ) : (
-                            <button className="icon-button-small" title="Archive" onClick={() => { onArchive(note.id); onClose(); }}>
-                                <span className="material-icons">archive</span>
-                            </button>
-                        )}
+                            <>
+                                {note.isArchived ? (
+                                    <button className="icon-button-small" title="Unarchive" onClick={() => { onUnarchive(note.id); onClose(); }}>
+                                        <span className="material-icons">unarchive</span>
+                                    </button>
+                                ) : (
+                                    <button className="icon-button-small" title="Archive" onClick={() => { onArchive(note.id); onClose(); }}>
+                                        <span className="material-icons">archive</span>
+                                    </button>
+                                )}
 
-                        <button className="icon-button-small" title="Delete" onClick={() => { onDelete(note.id); onClose(); }}>
-                            <span className="material-icons">delete</span>
-                        </button>
+                                <button className="icon-button-small" title="Delete" onClick={() => { onDelete(note.id); onClose(); }}>
+                                    <span className="material-icons">delete</span>
+                                </button>
+                            </>
+                        )}
 
                         <button className="icon-button-small"><span className="material-icons">undo</span></button>
                         <button className="icon-button-small"><span className="material-icons">redo</span></button>
