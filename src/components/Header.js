@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-const Header = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar, user, onLogout, isSaving }) => {
   return (
     <header className="header">
       <div className="header-left">
@@ -25,8 +25,8 @@ const Header = ({ toggleSidebar }) => {
       </div>
 
       <div className="header-right">
-        <button className="icon-button">
-          <span className="material-icons">refresh</span>
+        <button className="icon-button" onClick={() => window.location.reload()} disabled={isSaving}>
+          <span className={`material-icons ${isSaving ? 'spin-animation' : ''}`}>refresh</span>
         </button>
         <button className="icon-button">
           <span className="material-icons">view_agenda</span>
@@ -34,6 +34,17 @@ const Header = ({ toggleSidebar }) => {
         <button className="icon-button">
           <span className="material-icons">settings</span>
         </button>
+
+        {user && (
+          <>
+            <div className="profile-icon" title={user.name || user.email}>
+              {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
+            </div>
+            <button className="icon-button" onClick={onLogout} title="Logout">
+              <span className="material-icons">logout</span>
+            </button>
+          </>
+        )}
 
       </div>
     </header>
