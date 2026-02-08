@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const pool = require('./db');
+const authRoutes = require('./routes/auth');
+const authenticateToken = require('./middleware/auth');
 require('dotenv').config();
 
 // Middleware
@@ -10,14 +12,16 @@ app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 
 // ROUTES
 
+// Auth Routes
+app.use('/auth', authRoutes);
+
 // Create a Note
-app.post('/notes', async (req, res) => {
+app.post('/notes', authenticateToken, async (req, res) => {
     try {
         const { title, content, isArchived, isTrashed, color, backgroundImage, category, images } = req.body;
-        // Postgres arrays use {}, but pg library handles JS arrays if we pass them correctly or cast
         const newNote = await pool.query(
-            'INSERT INTO notes (title, content, is_archived, is_trashed, color, background_image, category, images) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [title, content, isArchived, isTrashed, color, backgroundImage, category, images]
+            'INSERT INTO notes (title, content, is_archived, is_trashed, color, background_image, category, images, user_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+            [title, content, isArchived, isTrashed, color, backgroundImage, category, images, req.user.id]
         );
         res.json(newNote.rows[0]);
     } catch (err) {
@@ -27,12 +31,9 @@ app.post('/notes', async (req, res) => {
 });
 
 // Get All Notes
-app.get('/notes', async (req, res) => {
+app.get('/notes', authenticateToken, async (req, res) => {
     try {
-        const allNotes = await pool.query('SELECT * FROM notes ORDER BY id DESC'); // Newest first
-        // Map database fields (snake_case) to frontend (camelCase) if needed, or update frontend to use snake_case
-        // Let's return as is and handle mapping, or alias in SQL.
-        // For simplicity, let's map in JS
+        const allNotes = await pool.query('SELECT * FROM notes WHERE user_id = $1 ORDER BY id DESC', [req.user.id]);
         const formattedNotes = allNotes.rows.map(note => ({
             id: note.id,
             title: note.title,
@@ -52,13 +53,19 @@ app.get('/notes', async (req, res) => {
 });
 
 // Update a Note
-app.put('/notes/:id', async (req, res) => {
+app.put('/notes/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const { title, content, isArchived, isTrashed, color, backgroundImage, category, images } = req.body;
+        // Verify user owns note
+        const checkOwner = await pool.query('SELECT * FROM notes WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+        if (checkOwner.rows.length === 0) {
+            return res.status(403).json('Not Authorized');
+        }
+
         const updateNote = await pool.query(
-            'UPDATE notes SET title = $1, content = $2, is_archived = $3, is_trashed = $4, color = $5, background_image = $6, category = $7, images = $8 WHERE id = $9',
-            [title, content, isArchived, isTrashed, color, backgroundImage, category, images, id]
+            'UPDATE notes SET title = $1, content = $2, is_archived = $3, is_trashed = $4, color = $5, background_image = $6, category = $7, images = $8 WHERE id = $9 AND user_id = $10',
+            [title, content, isArchived, isTrashed, color, backgroundImage, category, images, id, req.user.id]
         );
         res.json('Note was updated!');
     } catch (err) {
@@ -68,10 +75,13 @@ app.put('/notes/:id', async (req, res) => {
 });
 
 // Delete a Note
-app.delete('/notes/:id', async (req, res) => {
+app.delete('/notes/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const deleteNote = await pool.query('DELETE FROM notes WHERE id = $1', [id]);
+        const deleteNote = await pool.query('DELETE FROM notes WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+        if (deleteNote.rowCount === 0) {
+            return res.status(403).json('Not Authorized or Note not found');
+        }
         res.json('Note was deleted!');
     } catch (err) {
         console.error(err.message);
@@ -81,22 +91,20 @@ app.delete('/notes/:id', async (req, res) => {
 
 // LABELS
 
-// Get All Labels - We can store labels in a separate table, but initially we might just derive them or store them.
-// Let's implement the labels table as planned.
-app.post('/labels', async (req, res) => {
+app.post('/labels', authenticateToken, async (req, res) => {
     try {
         const { name } = req.body;
-        const newLabel = await pool.query('INSERT INTO labels (name) VALUES($1) RETURNING *', [name]);
-        res.json(newLabel.rows[0].name); // Frontend expects just strings for now in 'labels' array
+        const newLabel = await pool.query('INSERT INTO labels (name, user_id) VALUES($1, $2) RETURNING *', [name, req.user.id]);
+        res.json(newLabel.rows[0].name);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
 });
 
-app.get('/labels', async (req, res) => {
+app.get('/labels', authenticateToken, async (req, res) => {
     try {
-        const allLabels = await pool.query('SELECT * FROM labels ORDER BY name ASC');
+        const allLabels = await pool.query('SELECT * FROM labels WHERE user_id = $1 ORDER BY name ASC', [req.user.id]);
         res.json(allLabels.rows.map(l => l.name));
     } catch (err) {
         console.error(err.message);
@@ -104,11 +112,13 @@ app.get('/labels', async (req, res) => {
     }
 });
 
-app.delete('/labels/:name', async (req, res) => {
+app.delete('/labels/:name', authenticateToken, async (req, res) => {
     try {
         const { name } = req.params;
-        await pool.query('DELETE FROM labels WHERE name = $1', [name]);
-        // Also update notes? For now just delete label.
+        const deleteLabel = await pool.query('DELETE FROM labels WHERE name = $1 AND user_id = $2', [name, req.user.id]);
+        if (deleteLabel.rowCount === 0) {
+            return res.status(404).json('Label not found');
+        }
         res.json('Label deleted');
     } catch (err) {
         console.error(err.message);
