@@ -1,0 +1,6 @@
+@echo off
+echo Iniciando o Backend...
+start "Backend Keep Less" cmd /k "cd server && npm run dev"
+
+echo Iniciando o Frontend...
+start "Frontend Keep Less" cmd /k "npm start"
