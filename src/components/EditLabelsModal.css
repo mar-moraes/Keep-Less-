@@ -128,9 +128,9 @@
 .modal-footer {
     padding: 10px 15px 15px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
+    /* Changed to flex-end to match 'Done' button usually on right, or keep center if that's the design */
     border-top: 1px solid var(--border-color);
-
 }
 
 .done-button {
@@ -146,5 +146,4 @@
 
 .done-button:hover {
     background-color: rgba(95, 99, 104, 0.039);
-    /* Light grey hover */
 }

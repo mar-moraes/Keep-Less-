@@ -5,7 +5,6 @@ const EditLabelsModal = ({ labels, onAdd, onRename, onDelete, onClose }) => {
     const [newLabel, setNewLabel] = useState('');
     const [editingLabel, setEditingLabel] = useState(null); // The label currently being renamed
     const [editValue, setEditValue] = useState(''); // The new name for the label being edited
-    const [hoveredLabel, setHoveredLabel] = useState(null); // Track hover for delete icon
     const inputRef = useRef(null);
 
     // ... existing handleAdd, handleKeyDown ...

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './NoteCard.css';
+import CollaboratorModal from './CollaboratorModal';
 
 const NoteCard = ({
     note,
@@ -15,6 +16,7 @@ const NoteCard = ({
     onCategoryChange
 }) => {
     const [showColorPalette, setShowColorPalette] = useState(false);
+    const [showCollaboratorModal, setShowCollaboratorModal] = useState(false);
     const [paletteTab, setPaletteTab] = useState('COLORS'); // COLORS or IMAGES
     const fileInputRef = React.useRef(null);
     const paletteRef = React.useRef(null);
@@ -73,6 +75,11 @@ const NoteCard = ({
     const handleImageClick = (e) => {
         e.stopPropagation();
         fileInputRef.current.click();
+    };
+
+    const handleCollaboratorClick = (e) => {
+        e.stopPropagation();
+        setShowCollaboratorModal(true);
     };
 
     const handleFileChange = (e) => {
@@ -173,7 +180,7 @@ const NoteCard = ({
                 ) : (
                     <>
                         <button className="icon-button-small" title="Remind me" onClick={(e) => e.stopPropagation()}><span className="material-icons">add_alert</span></button>
-                        <button className="icon-button-small" title="Collaborator" onClick={(e) => e.stopPropagation()}><span className="material-icons">person_add</span></button>
+                        <button className="icon-button-small" title="Collaborator" onClick={handleCollaboratorClick}><span className="material-icons">person_add</span></button>
 
                         <div className="color-palette-wrapper">
                             <button
@@ -272,6 +279,16 @@ const NoteCard = ({
                     </>
                 )}
             </div>
+            {showCollaboratorModal && (
+                <CollaboratorModal
+                    note={note}
+                    onClose={(e) => {
+                        if (e) e.stopPropagation();
+                        setShowCollaboratorModal(false);
+                    }}
+                    onSave={() => setShowCollaboratorModal(false)}
+                />
+            )}
         </div>
     );
 };

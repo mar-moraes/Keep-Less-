@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './NoteModal.css';
+import CollaboratorModal from './CollaboratorModal';
 
 const NoteModal = ({
     note,
@@ -20,6 +21,7 @@ const NoteModal = ({
     const [showColorPalette, setShowColorPalette] = useState(false);
     const [paletteTab, setPaletteTab] = useState('COLORS');
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [showCollaboratorModal, setShowCollaboratorModal] = useState(false);
     const modalRef = useRef(null);
     const fileInputRef = useRef(null);
     const paletteRef = useRef(null);
@@ -183,7 +185,7 @@ const NoteModal = ({
                 <div className="modal-footer">
                     <div className="modal-actions">
                         <button className="icon-button-small" title="Remind me"><span className="material-icons">add_alert</span></button>
-                        <button className="icon-button-small" title="Collaborator"><span className="material-icons">person_add</span></button>
+                        <button className="icon-button-small" title="Collaborator" onClick={() => setShowCollaboratorModal(true)}><span className="material-icons">person_add</span></button>
 
                         <div className="color-palette-wrapper">
                             <button className="icon-button-small" title="Change color" onClick={(e) => { e.stopPropagation(); setShowColorPalette(!showColorPalette); }}>
@@ -298,7 +300,16 @@ const NoteModal = ({
                     </button>
                 </div>
             </div>
-        </div>
+            {
+                showCollaboratorModal && (
+                    <CollaboratorModal
+                        note={note}
+                        onClose={() => setShowCollaboratorModal(false)}
+                        onSave={() => setShowCollaboratorModal(false)}
+                    />
+                )
+            }
+        </div >
     );
 };
 

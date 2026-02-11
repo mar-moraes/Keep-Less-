@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
+const collaboratorRoutes = require('./routes/collaborators');
 const authenticateToken = require('./middleware/auth');
 require('dotenv').config();
 
@@ -14,6 +15,7 @@ app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 
 // Auth Routes
 app.use('/auth', authRoutes);
+app.use('/collaborators', collaboratorRoutes);
 
 // Create a Note
 app.post('/notes', authenticateToken, async (req, res) => {
@@ -33,7 +35,14 @@ app.post('/notes', authenticateToken, async (req, res) => {
 // Get All Notes
 app.get('/notes', authenticateToken, async (req, res) => {
     try {
-        const allNotes = await pool.query('SELECT * FROM notes WHERE user_id = $1 ORDER BY id DESC', [req.user.id]);
+        const allNotes = await pool.query(
+            `SELECT DISTINCT n.* 
+             FROM notes n 
+             LEFT JOIN collaborators c ON n.id = c.note_id 
+             WHERE n.user_id = $1 OR c.user_id = $1 
+             ORDER BY n.id DESC`,
+            [req.user.id]
+        );
         const formattedNotes = allNotes.rows.map(note => ({
             id: note.id,
             title: note.title,
@@ -58,14 +67,32 @@ app.put('/notes/:id', authenticateToken, async (req, res) => {
         const { id } = req.params;
         const { title, content, isArchived, isTrashed, color, backgroundImage, category, images } = req.body;
         // Verify user owns note
-        const checkOwner = await pool.query('SELECT * FROM notes WHERE id = $1 AND user_id = $2', [id, req.user.id]);
+        // Verify user owns note or is collaborator
+        const checkOwner = await pool.query('SELECT * FROM notes WHERE id = $1', [id]);
         if (checkOwner.rows.length === 0) {
+            return res.status(404).json('Note not found');
+        }
+
+        const note = checkOwner.rows[0];
+        let isAuthorized = note.user_id === req.user.id;
+
+        if (!isAuthorized) {
+            const checkCollaborator = await pool.query(
+                'SELECT * FROM collaborators WHERE note_id = $1 AND user_id = $2',
+                [id, req.user.id]
+            );
+            if (checkCollaborator.rows.length > 0) {
+                isAuthorized = true;
+            }
+        }
+
+        if (!isAuthorized) {
             return res.status(403).json('Not Authorized');
         }
 
         const updateNote = await pool.query(
-            'UPDATE notes SET title = $1, content = $2, is_archived = $3, is_trashed = $4, color = $5, background_image = $6, category = $7, images = $8 WHERE id = $9 AND user_id = $10',
-            [title, content, isArchived, isTrashed, color, backgroundImage, category, images, id, req.user.id]
+            'UPDATE notes SET title = $1, content = $2, is_archived = $3, is_trashed = $4, color = $5, background_image = $6, category = $7, images = $8 WHERE id = $9',
+            [title, content, isArchived, isTrashed, color, backgroundImage, category, images, id]
         );
         res.json('Note was updated!');
     } catch (err) {
@@ -130,4 +157,5 @@ app.delete('/labels/:name', authenticateToken, async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server has started on port ${PORT}`);
+    console.log(`Collaborator routes loaded.`);
 });
