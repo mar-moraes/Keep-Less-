@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -6,9 +7,16 @@ import NoteInput from './components/NoteInput';
 import NotesGrid from './components/NotesGrid';
 import NoteModal from './components/NoteModal';
 import EditLabelsModal from './components/EditLabelsModal';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import PrivateRoute from './components/PrivateRoute';
+import { AuthProvider } from './context/AuthContext';
+import AuthContext from './context/AuthContext';
 import api from './api';
 
-function App() {
+function Dashboard() {
+  const { logout, user } = useContext(AuthContext); // Hook for logout if needed in Header
+  // TODO: Pass logout to Header or Sidebar
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [selectedNote, setSelectedNote] = useState(null);
   const [view, setView] = useState('NOTES'); // NOTES, ARCHIVE, TRASH
@@ -16,6 +24,7 @@ function App() {
   const [labels, setLabels] = useState([]); // Initial labels empty
   const [notes, setNotes] = useState([]); // Initial notes empty
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Initial Fetch
   useEffect(() => {
@@ -43,11 +52,14 @@ function App() {
   // Label Management
   const handleAddLabel = async (newLabel) => {
     if (!labels.includes(newLabel)) {
+      setIsSaving(true);
       try {
         await api.createLabel(newLabel);
         setLabels([...labels, newLabel]);
       } catch (error) {
         console.error("Error creating label:", error);
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -71,11 +83,12 @@ function App() {
     // Let's update the notes locally and on server.
     // For rename:
     try {
+      setIsSaving(true);
       // 1. Create new label
       await api.createLabel(newLabel);
       // 2. Update all notes with old label to new label
       const notesToUpdate = notes.filter(n => n.category === oldLabel);
-      await Promise.all(notesToUpdate.map(n => api.updateNote(n.id, { ...n, category: newLabel })));
+      await Promise.all(notesToUpdate.map(n => api.updateNote({ ...n, category: newLabel })));
       // 3. Delete old label
       await api.deleteLabel(oldLabel);
 
@@ -83,10 +96,13 @@ function App() {
       setNotes(notes.map(n => n.category === oldLabel ? { ...n, category: newLabel } : n));
     } catch (error) {
       console.error("Error renaming label:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDeleteLabel = async (label) => {
+    setIsSaving(true);
     try {
       await api.deleteLabel(label);
       setLabels(labels.filter(l => l !== label));
@@ -95,13 +111,16 @@ function App() {
       // Optimistically update UI
       setNotes(notes.map(n => n.category === label ? { ...n, category: '' } : n));
       // Update server
-      await Promise.all(notesToUpdate.map(n => api.updateNote(n.id, { ...n, category: '' })));
+      await Promise.all(notesToUpdate.map(n => api.updateNote({ ...n, category: '' })));
     } catch (error) {
       console.error("Error deleting label:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const addNote = async (noteParams) => {
+    setIsSaving(true);
     try {
       const newNote = await api.createNote({
         title: noteParams.title || '',
@@ -116,6 +135,8 @@ function App() {
       setNotes([newNote, ...notes]);
     } catch (error) {
       console.error("Error adding note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -129,108 +150,138 @@ function App() {
   };
 
   const handleUpdateNote = async (updatedNote) => {
+    setIsSaving(true);
     try {
-      await api.updateNote(updatedNote.id, updatedNote);
+      await api.updateNote(updatedNote);
       setNotes(notes.map((n) => (n.id === updatedNote.id ? updatedNote : n)));
     } catch (error) {
       console.error("Error updating note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const archiveNote = async (id) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, isArchived: true, isTrashed: false };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error archiving note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const unarchiveNote = async (id) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, isArchived: false };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error unarchiving note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const deleteNote = async (id) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, isTrashed: true, isArchived: false };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error trashing note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const restoreNote = async (id) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, isTrashed: false };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error restoring note:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const permanentlyDeleteNote = async (id) => {
+    setIsSaving(true);
     try {
       await api.deleteNote(id);
       setNotes(notes.filter(n => n.id !== id));
     } catch (error) {
       console.error("Error deleting note permanently:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const changeNoteColor = async (id, color) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, color, backgroundImage: null };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error changing color:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const addImageToNote = async (id, imageUrl) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, images: [...(note.images || []), imageUrl] };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error adding image:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const changeNoteBackground = async (id, backgroundImage) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, backgroundImage, color: '#ffffff' };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error changing background:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const changeNoteCategory = async (id, category) => {
+    setIsSaving(true);
     try {
       const note = notes.find(n => n.id === id);
       const updated = { ...note, category };
-      await api.updateNote(id, updated);
+      await api.updateNote(updated);
       setNotes(notes.map(n => n.id === id ? updated : n));
     } catch (error) {
       console.error("Error changing category:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -260,7 +311,7 @@ function App() {
 
   return (
     <div className="app">
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} user={user} onLogout={logout} isSaving={isSaving} />
       <div className="main-container">
         <Sidebar
           isExpanded={isSidebarExpanded}
@@ -300,6 +351,7 @@ function App() {
       )}
 
       {selectedNote && (
+
         <NoteModal
           note={notes.find(n => n.id === selectedNote.id) || selectedNote}
           onClose={handleCloseModal}
@@ -316,6 +368,27 @@ function App() {
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/*"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 }
 

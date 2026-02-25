@@ -240,11 +240,15 @@
     /* Ensure container handles positioning context */
 }
 
+/* Ensure buttons are above the image */
 .image-nav-button {
+    z-index: 100;
+    /* Increased z-index */
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Use .5 for better visibility */
     color: white;
     border: none;
     border-radius: 50%;
@@ -254,17 +258,17 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.2s, background-color 0.2s;
+    opacity: 0.8;
+    /* Always visible */
+    transition: background-color 0.2s;
 }
 
-.modal-images-container:hover .image-nav-button {
-    opacity: 1;
-}
+/* Remove hover opacity rule as it is now always visible */
+/* .modal-images-container:hover .image-nav-button { opacity: 1; } */
 
 .image-nav-button:hover {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.8);
+    opacity: 1;
 }
 
 .prev-button {
