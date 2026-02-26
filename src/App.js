@@ -18,6 +18,8 @@ function Dashboard() {
   const { logout, user } = useContext(AuthContext); // Hook for logout if needed in Header
   // TODO: Pass logout to Header or Sidebar
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Para mobile offcanvas
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [selectedNote, setSelectedNote] = useState(null);
   const [view, setView] = useState('NOTES'); // NOTES, ARCHIVE, TRASH
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
@@ -25,6 +27,17 @@ function Dashboard() {
   const [notes, setNotes] = useState([]); // Initial notes empty
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Detectar mudança de tamanho de tela
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setIsSidebarOpen(false); // Fechar offcanvas ao entrar em desktop
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Initial Fetch
   useEffect(() => {
@@ -46,7 +59,11 @@ function Dashboard() {
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
+    if (isMobile) {
+      setIsSidebarOpen(!isSidebarOpen);
+    } else {
+      setIsSidebarExpanded(!isSidebarExpanded);
+    }
   };
 
   // Label Management
@@ -315,10 +332,21 @@ function Dashboard() {
       <div className="main-container">
         <Sidebar
           isExpanded={isSidebarExpanded}
+          isMobile={isMobile}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
           activeView={view}
-          onViewChange={handleViewChange}
+          onViewChange={(v) => { handleViewChange(v); if (isMobile) setIsSidebarOpen(false); }}
           labels={labels}
         />
+        {/* Overlay para fechar offcanvas ao clicar fora */}
+        {isMobile && isSidebarOpen && (
+          <div
+            className="offcanvas-backdrop fade show"
+            onClick={() => setIsSidebarOpen(false)}
+            style={{ zIndex: 1039 }}
+          />
+        )}
         <main className="content">
           {(view === 'NOTES' || !['ARCHIVE', 'TRASH'].includes(view)) && (
             <NoteInput onAddParams={(params) => addNote({ ...params, category: view === 'NOTES' ? '' : view })} />
@@ -351,7 +379,6 @@ function Dashboard() {
       )}
 
       {selectedNote && (
-
         <NoteModal
           note={notes.find(n => n.id === selectedNote.id) || selectedNote}
           onClose={handleCloseModal}

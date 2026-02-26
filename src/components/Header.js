@@ -8,7 +8,6 @@ const Header = ({ toggleSidebar, user, onLogout, isSaving }) => {
         <button className="icon-button" onClick={toggleSidebar}>
           <span className="material-icons">menu</span>
         </button>
-
         <span className="logo-text">Keep Less</span>
       </div>
 
@@ -18,26 +17,25 @@ const Header = ({ toggleSidebar, user, onLogout, isSaving }) => {
             <span className="material-icons">search</span>
           </button>
           <input type="text" placeholder="Search" />
-          <button className="icon-button clear-icon">
-            <span className="material-icons">close</span>
-          </button>
         </div>
       </div>
 
       <div className="header-right">
+        {/* Refresh: visível sempre */}
         <button className="icon-button" onClick={() => window.location.reload()} disabled={isSaving}>
           <span className={`material-icons ${isSaving ? 'spin-animation' : ''}`}>refresh</span>
         </button>
-        <button className="icon-button">
+        {/* Estes dois somem em mobile (< 768px) */}
+        <button className="icon-button btn-header-desktop">
           <span className="material-icons">view_agenda</span>
         </button>
-        <button className="icon-button">
+        <button className="icon-button btn-header-desktop">
           <span className="material-icons">settings</span>
         </button>
 
         {user && (
           <>
-            <div className="profile-icon" title={user.name || user.email}>
+            <div className="profile-icon btn-header-secondary" title={user.name || user.email}>
               {user.name ? user.name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U')}
             </div>
             <button className="icon-button" onClick={onLogout} title="Logout">
@@ -45,7 +43,6 @@ const Header = ({ toggleSidebar, user, onLogout, isSaving }) => {
             </button>
           </>
         )}
-
       </div>
     </header>
   );

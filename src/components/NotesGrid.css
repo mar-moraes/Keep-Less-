@@ -6,23 +6,29 @@
     margin: 0 auto;
 }
 
-@media (max-width: 1100px) {
+/* xl ≥ 1200px → 4 colunas (default acima) */
+
+/* lg: 992px–1199px → 3 colunas */
+@media (max-width: 1199px) {
     .notes-grid {
         column-count: 3;
     }
 }
 
-@media (max-width: 800px) {
+/* md: 768px–991px → 2 colunas */
+@media (max-width: 991px) {
     .notes-grid {
         column-count: 2;
     }
 }
 
-@media (max-width: 550px) {
+/* sm + xs: < 576px → 1 coluna */
+@media (max-width: 575px) {
     .notes-grid {
         column-count: 1;
     }
 }
+
 
 /* Category Headers for Archive View */
 .notes-category-section {

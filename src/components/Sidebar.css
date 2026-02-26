@@ -8,6 +8,7 @@
     padding-top: 8px;
     transition: width 0.2s ease;
     overflow: hidden;
+    z-index: 100;
 }
 
 .sidebar.collapsed {
@@ -62,4 +63,59 @@
     font-weight: 500;
     white-space: nowrap;
     transition: opacity 0.2s;
+}
+
+/* Ocultar sidebar desktop em telas < 768px */
+@media (max-width: 767px) {
+    .sidebar {
+        display: none;
+    }
+}
+
+/* ==============================
+   OFFCANVAS MOBILE
+   ============================== */
+.sidebar-offcanvas {
+    background-color: var(--header-bg) !important;
+    color: var(--text-color) !important;
+    top: 0 !important;
+    width: var(--sidebar-width) !important;
+    z-index: 1045 !important;
+    padding-top: 0 !important;
+}
+
+.sidebar-offcanvas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    height: var(--header-height);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-text-sidebar {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 22px;
+    color: var(--secondary-text);
+}
+
+/* Animar offcanvas de entrada */
+.offcanvas.offcanvas-start {
+    transition: transform 0.3s ease-in-out !important;
+}
+
+.offcanvas.offcanvas-start.show {
+    transform: translateX(0) !important;
+}
+
+/* Nav items dentro do offcanvas seguem o mesmo estilo */
+.sidebar-offcanvas .nav-item {
+    padding-left: 24px;
+    margin-right: 10px;
+    border-radius: 0 25px 25px 0;
+}
+
+.sidebar-offcanvas .nav-item .material-icons {
+    margin-right: 20px;
+    color: var(--icon-color);
 }

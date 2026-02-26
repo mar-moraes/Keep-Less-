@@ -2,25 +2,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
+    padding: 0 8px;
     height: var(--header-height);
     border-bottom: 1px solid var(--border-color);
     background-color: var(--header-bg);
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 1030;
+    gap: 4px;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .header-left {
     display: flex;
     align-items: center;
-    min-width: 230px;
-}
-
-.logo-img {
-    height: 40px;
-    margin: 0 8px 0 16px;
+    flex-shrink: 0;
 }
 
 .logo-text {
@@ -28,12 +26,21 @@
     font-size: 22px;
     color: var(--secondary-text);
     line-height: 24px;
+    white-space: nowrap;
+    margin-left: 4px;
+}
+
+/* Ocultar texto do logo em telas xs */
+@media (max-width: 575px) {
+    .logo-text {
+        display: none;
+    }
 }
 
 .header-middle {
     flex: 1;
-    max-width: 720px;
-    margin: 0 10px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .search-bar {
@@ -59,12 +66,29 @@
     padding: 10px;
     font-size: 16px;
     outline: none;
+    color: var(--text-color);
+    min-width: 0;
+    width: 100%;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    padding-right: 10px;
+    flex-shrink: 0;
+}
+
+/* Em telas xs (< 576px): ocultar botões secundários do header-right */
+@media (max-width: 575px) {
+    .btn-header-secondary {
+        display: none !important;
+    }
+}
+
+/* Em telas sm (576-767px): ocultar configs e view */
+@media (max-width: 767px) {
+    .btn-header-desktop {
+        display: none !important;
+    }
 }
 
 .icon-button {
@@ -78,7 +102,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 2px;
+    flex-shrink: 0;
 }
 
 .icon-button:hover {
@@ -98,8 +122,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 10px;
+    margin: 0 4px 0 8px;
     cursor: pointer;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 @keyframes spin {
@@ -115,5 +142,4 @@
 .spin-animation {
     animation: spin 1s linear infinite;
     color: var(--primary-color, #fbbc04);
-    /* Optional: Change color when saving */
 }

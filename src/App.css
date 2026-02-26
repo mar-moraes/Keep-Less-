@@ -1,30 +1,37 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .main-container {
   display: flex;
   flex: 1;
   margin-top: var(--header-height);
-  /* Offset for fixed header */
 }
 
+/* Desktop: content offset para a sidebar fixa */
 .content {
   flex: 1;
-  padding: 32px;
+  padding: 24px 16px;
   margin-left: var(--sidebar-width);
-  /* Offset for fixed sidebar */
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
 }
 
-/* For smaller screens, adjust margins */
-@media (max-width: 900px) {
+/* Tablet: sidebar colapsada (80px) */
+@media (max-width: 991px) {
   .content {
     margin-left: 80px;
-    /* Collapsed sidebar width */
+  }
+}
+
+/* Mobile: sidebar vira offcanvas, sem margin */
+@media (max-width: 767px) {
+  .content {
+    margin-left: 0;
+    padding: 16px 12px;
   }
 }
