@@ -24,6 +24,7 @@ const NoteInput = ({ onAddParams }) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [title, content, category]); // Dep needed to capture current state
 
     const closeInput = () => {

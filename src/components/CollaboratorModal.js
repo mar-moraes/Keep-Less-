@@ -8,9 +8,11 @@ const CollaboratorModal = ({ note, onClose, onSave }) => {
     const [newEmail, setNewEmail] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchCollaborators();
     }, [note]);
+
 
     const fetchCollaborators = async () => {
         try {

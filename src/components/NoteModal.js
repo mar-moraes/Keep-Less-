@@ -60,6 +60,7 @@ const NoteModal = ({
     };
 
     // Update local state if note prop changes - Only when ID changes to avoid overwriting typed text on color change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         setTitle(note.title);
         setContent(note.content);
@@ -85,6 +86,7 @@ const NoteModal = ({
 
 
     // Close when clicking outside
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
