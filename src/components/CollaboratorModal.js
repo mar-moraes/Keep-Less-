@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './CollaboratorModal.css';
-import { api } from '../api'; // Assuming api.js exports an 'api' object or axios instance
+
 
 const CollaboratorModal = ({ note, onClose, onSave }) => {
     const [collaborators, setCollaborators] = useState([]);

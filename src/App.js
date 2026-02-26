@@ -25,7 +25,6 @@ function Dashboard() {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
   const [labels, setLabels] = useState([]); // Initial labels empty
   const [notes, setNotes] = useState([]); // Initial notes empty
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   // Detectar mudança de tamanho de tela
@@ -52,7 +51,7 @@ function Dashboard() {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setIsLoading(false);
+        // loading done
       }
     };
     fetchData();
